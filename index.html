@@ -8,7 +8,7 @@
 <meta property="og:title" content="Inthanin B2B - สั่งกาแฟส่งถึงออฟฟิศ">
 <meta property="og:description" content="ส่งฟรี · แถมสูงสุด 2 แก้ว · เลือกวันและเวลาส่งเองได้">
 <style>
-  html,body{margin:0;height:100%;background:#f5f5f5}
+  html,body{margin:0;height:100%;background:#f7efe2}
   iframe{position:fixed;inset:0;width:100%;height:100%;border:0}
   #load{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
         font:16px sans-serif;color:#1e4d2b}
@@ -16,8 +16,28 @@
 </head>
 <body>
 <div id="load">กำลังโหลด…</div>
-<!-- ⬇️ วางลิงก์เว็บแอป (ลงท้ายด้วย /exec) แทน URL ข้างล่าง -->
 <iframe src="https://script.google.com/macros/s/AKfycbxTqwaXOoZi75jzjP0lA0LqKciVgTUDNTDPfAhL6qrjQPB0H5X2sHan5bV-2JUHpL4/exec"
         allow="clipboard-write; web-share" onload="document.getElementById('load').remove()"></iframe>
+<script>
+(function () {
+  var KEYS = ['inthanin_customer', 'inthanin_last_order'];
+  window.addEventListener('message', function (e) {
+    if (!/^https:\/\/[a-z0-9-]+\.googleusercontent\.com$/.test(e.origin)) return;
+    var d = e.data;
+    if (!d || typeof d !== 'object' || !d.inth) return;
+    try {
+      if (d.inth === 'set' && KEYS.indexOf(d.k) >= 0) {
+        localStorage.setItem('w_' + d.k, JSON.stringify(d.v));
+      } else if (d.inth === 'remove' && KEYS.indexOf(d.k) >= 0) {
+        localStorage.removeItem('w_' + d.k);
+      } else if (d.inth === 'get') {
+        var out = {};
+        KEYS.forEach(function (k) { var v = localStorage.getItem('w_' + k); if (v) out[k] = JSON.parse(v); });
+        e.source.postMessage({ inth: 'data', data: out }, e.origin);
+      }
+    } catch (err) {}
+  });
+})();
+</script>
 </body>
 </html>
